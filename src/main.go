@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 )
@@ -12,7 +13,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "This is the home page")
 }
 
-// About is the about oage handler
+// About is the about page handler
 func About(w http.ResponseWriter, r *http.Request) {
 	sum := addValues(2, 2)
 	_, _ = fmt.Fprintf(w, fmt.Sprintf("This is the abount page add 2 + 2 is %d", sum))
@@ -23,10 +24,30 @@ func addValues(x, y int) int {
 	return x + y
 }
 
+// Divide is the divide page handler
+func Divide(w http.ResponseWriter, r *http.Request) {
+	f, err := divideValues(0.0, 0.0)
+	if err != nil {
+		fmt.Fprintf(w, "Cannot divide by zero")
+	}
+	fmt.Fprintf(w, fmt.Sprintf("%f divided by %f is %f", 0.0, 0.0, f))
+}
+
+// divideValues is divides two integers and return the divided value
+func divideValues(x, y float32) (float32, error) {
+	if y <= 0 {
+		err := errors.New("cannot divide by zero")
+		return 0, err
+	}
+	result := x / y
+	return result, nil
+}
+
 // main is the main application function
 func main() {
 	http.HandleFunc("/", Home)
 	http.HandleFunc("/about", About)
+	http.HandleFunc("/divide", Divide)
 
 	fmt.Println(fmt.Sprintf("Starting application on port %s", posrNumber))
 	http.ListenAndServe(posrNumber, nil)
